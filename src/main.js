@@ -1,4 +1,5 @@
 import './style.css'
+import { renderDashboard } from './dashboard.js'
 
 document.querySelector('#app').innerHTML = `
   <main class="login-page">
@@ -78,9 +79,11 @@ pinInput.addEventListener('input', () => {
 loginForm.addEventListener('submit', (event) => {
   event.preventDefault()
 
-  const usuarioSelecionado =
-    document.querySelector('#usuario').selectedOptions[0].text
+  const usuarioId = document.querySelector('#usuario').value
 
-  loginMessage.textContent =
-    `Acesso de ${usuarioSelecionado} pronto. A autenticação será conectada ao Firebase.`
+  loginMessage.textContent = 'Acessando o sistema...'
+
+  setTimeout(() => {
+    renderDashboard(usuarioId)
+  }, 500)
 })
