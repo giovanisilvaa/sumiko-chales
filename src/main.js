@@ -1,60 +1,86 @@
 import './style.css'
-import heroImg from './assets/hero.png'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import { setupCounter } from './counter.js'
 
 document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+  <main class="login-page">
+    <section class="login-image" aria-label="Fachada do Sumiko Chalés">
+      <div class="image-overlay">
+        <p class="location">Ubatuba • São Paulo</p>
+        <h1>Gestão simples para cuidar de cada hospedagem.</h1>
+        <p>
+          Reservas, entradas, saídas e organização dos chalés em um só lugar.
+        </p>
+      </div>
+    </section>
 
-<div class="ticks"></div>
+    <section class="login-area">
+      <div class="login-card">
+        <img
+          class="logo"
+          src="/images/logo-sumiko.jfif"
+          alt="Logotipo do Sumiko Chalés"
+        />
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+        <div class="login-heading">
+          <h2>Bem-vindo</h2>
+          <p>Selecione seu nome e informe sua senha numérica.</p>
+        </div>
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+        <form id="login-form">
+          <div class="form-group">
+            <d<label for="usuario">Usuário</label>
+
+            <select id="usuario" name="usuario" required>
+              <option value="">Selecione seu nome</option>
+              <option value="renato">Renato — Proprietário</option>
+              <option value="fernanda">Fernanda — Proprietária</option>
+              <option value="giovani">Giovani — Zelador</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="pin">Senha numérica</label>
+
+            <input
+              type="password"
+              id="pin"
+              name="pin"
+              placeholder="Digite os 6 números"
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              minlength="6"
+              maxlength="6"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <button type="submit">Entrar</button>
+
+          <p id="login-message" class="login-message" role="status"></p>
+        </form>
+
+        <p class="footer-text">
+          Sistema interno de gestão • Sumiko Chalés
+        </p>
+      </div>
+    </section>
+  </main>
 `
 
-setupCounter(document.querySelector('#counter'))
+const loginForm = document.querySelector('#login-form')
+const pinInput = document.querySelector('#pin')
+const loginMessage = document.querySelector('#login-message')
+
+pinInput.addEventListener('input', () => {
+  pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 6)
+})
+
+loginForm.addEventListener('submit', (event) => {
+  event.preventDefault()
+
+  const usuarioSelecionado =
+    document.querySelector('#usuario').selectedOptions[0].text
+
+  loginMessage.textContent =
+    `Acesso de ${usuarioSelecionado} pronto. A autenticação será conectada ao Firebase.`
+})
