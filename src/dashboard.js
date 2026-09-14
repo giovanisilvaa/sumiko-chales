@@ -162,7 +162,7 @@ export function renderDashboard(usuarioId) {
             <span class="summary-icon icon-occupied">●</span>
             <div>
               <strong id="summary-occupied">0</strong>
-              <span>Ocupados</span>
+              <span>Ocupados/limpeza</span>
             </div>
           </article>
 

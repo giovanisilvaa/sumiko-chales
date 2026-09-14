@@ -1119,3 +1119,49 @@ button:focus-visible {
     width: 100%;
   }
 }
+/* Check-out e limpeza */
+
+.confirm-checkout-button,
+.confirm-cleaning-button {
+  margin-top: 14px;
+}
+
+.confirm-checkout-button {
+  background: linear-gradient(135deg, #d86f4b, #b94f30);
+}
+
+.confirm-cleaning-button {
+  background: linear-gradient(135deg, #23866f, #11624f);
+}
+
+.confirm-checkout-button:disabled,
+.confirm-cleaning-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
+}
+
+.cleaning-confirmed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 18px;
+  color: #11624f;
+  background-color: #e5f6ef;
+  border: 1px solid #b9e4d5;
+  border-radius: 12px;
+}
+
+.cleaning-confirmed span {
+  font-size: 0.88rem;
+}
+.chale-limpeza {
+  border-top-color: #d39b20;
+  background-color: #fffdf6;
+}
+
+.status-limpeza {
+  color: #7a5a0f;
+  background-color: #fff3c9;
+}

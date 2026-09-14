@@ -58,6 +58,9 @@ export async function abrirDetalhesReserva(reservaId) {
 
     const saldoRestante = Number(reserva.saldoRestante) || 0
     const checkInRealizado = reserva.checkInRealizado === true
+    const checkOutRealizado = reserva.checkOutRealizado === true
+    const limpezaPendente = reserva.limpeza === 'pendente'
+    const limpezaConcluida = reserva.limpeza === 'concluida'
     const pagamentoCompleto =
       reserva.saldoRecebido === true || saldoRestante === 0
 
@@ -199,12 +202,21 @@ export async function abrirDetalhesReserva(reservaId) {
       reserva.observacoes || 'Nenhuma observação.',
     )
 
-    definirTexto(
-      '#details-status',
-      checkInRealizado
-        ? 'Check-in realizado'
-        : 'Aguardando check-in',
-    )
+    let textoStatus = 'Aguardando check-in'
+
+if (checkInRealizado) {
+  textoStatus = 'Hóspede hospedado'
+}
+
+if (checkOutRealizado && limpezaPendente) {
+  textoStatus = 'Check-out realizado • Aguardando limpeza'
+}
+
+if (checkOutRealizado && limpezaConcluida) {
+  textoStatus = 'Hospedagem finalizada • Chalé limpo'
+}
+
+definirTexto('#details-status', textoStatus)
 
     const checkinArea = document.querySelector('#checkin-area')
 
@@ -338,6 +350,110 @@ export async function abrirDetalhesReserva(reservaId) {
       `
     }
 
+    if (checkInRealizado && !checkOutRealizado && eZelador) {
+  checkinArea.insertAdjacentHTML(
+    'beforeend',
+    `
+      <button
+        type="button"
+        id="confirm-checkout-button"
+        class="confirm-checkout-button"
+      >
+        Confirmar check-out
+      </button>
+    `,
+  )
+
+  document
+    .querySelector('#confirm-checkout-button')
+    .addEventListener('click', async (event) => {
+      const botao = event.currentTarget
+
+      botao.disabled = true
+      botao.textContent = 'Confirmando check-out...'
+
+      try {
+        await updateDoc(referencia, {
+          checkOutRealizado: true,
+          checkOutEm: serverTimestamp(),
+          checkOutPor: usuario.email,
+          statusHospedagem: 'aguardando_limpeza',
+          limpeza: 'pendente',
+          atualizadoEm: serverTimestamp(),
+        })
+
+        window.alert(
+          'Check-out confirmado. O chalé está aguardando limpeza.',
+        )
+
+        dialog.close()
+      } catch (error) {
+        console.error('Erro ao confirmar check-out:', error)
+
+        window.alert('Não foi possível confirmar o check-out.')
+
+        botao.disabled = false
+        botao.textContent = 'Confirmar check-out'
+      }
+    })
+}
+
+if (checkOutRealizado && limpezaPendente && eZelador) {
+  checkinArea.insertAdjacentHTML(
+    'beforeend',
+    `
+      <button
+        type="button"
+        id="confirm-cleaning-button"
+        class="confirm-cleaning-button"
+      >
+        Marcar chalé como limpo
+      </button>
+    `,
+  )
+
+  document
+    .querySelector('#confirm-cleaning-button')
+    .addEventListener('click', async (event) => {
+      const botao = event.currentTarget
+
+      botao.disabled = true
+      botao.textContent = 'Confirmando limpeza...'
+
+      try {
+        await updateDoc(referencia, {
+          limpeza: 'concluida',
+          limpezaEm: serverTimestamp(),
+          limpezaPor: usuario.email,
+          statusHospedagem: 'finalizado',
+          atualizadoEm: serverTimestamp(),
+        })
+
+        window.alert('Limpeza confirmada. Chalé liberado.')
+
+        dialog.close()
+      } catch (error) {
+        console.error('Erro ao confirmar limpeza:', error)
+
+        window.alert('Não foi possível confirmar a limpeza.')
+
+        botao.disabled = false
+        botao.textContent = 'Marcar chalé como limpo'
+      }
+    })
+}
+
+if (checkOutRealizado && limpezaConcluida) {
+  checkinArea.insertAdjacentHTML(
+    'beforeend',
+    `
+      <div class="cleaning-confirmed">
+        <strong>✓ Limpeza concluída</strong>
+        <span>O chalé está pronto para a próxima hospedagem.</span>
+      </div>
+    `,
+  )
+}
     function fecharDetalhes() {
       dialog.close()
     }

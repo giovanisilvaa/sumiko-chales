@@ -58,6 +58,7 @@ function deixarChaleLivre(cartao) {
   'chale-ocupado',
   'chale-reservado',
   'chale-clickable',
+  'chale-limpeza',
 )
 
 delete cartao.dataset.reservaId
@@ -77,7 +78,10 @@ function mostrarChaleOcupado(cartao, reserva) {
   const informacao = cartao.querySelector('.chale-information')
   const saida = converterData(reserva.saida)
 
-  cartao.classList.remove('chale-reservado')
+  cartao.classList.remove(
+  'chale-reservado',
+  'chale-limpeza',
+)
   cartao.classList.add('chale-ocupado')
 
   badge.className = 'status-badge status-ocupado'
@@ -93,12 +97,38 @@ cartao.dataset.reservaId = reserva.id
 cartao.onclick = () => abrirDetalhesReserva(reserva.id)
 }
 
+function mostrarAguardandoLimpeza(cartao, reserva) {
+  const badge = cartao.querySelector('.status-badge')
+  const informacao = cartao.querySelector('.chale-information')
+
+  cartao.classList.remove('chale-ocupado', 'chale-reservado')
+  cartao.classList.add(
+    'chale-limpeza',
+    'chale-clickable',
+  )
+
+  badge.className = 'status-badge status-limpeza'
+  badge.textContent = 'Limpeza'
+
+  atualizarInformacao(
+    informacao,
+    'Check-out realizado',
+    'Aguardando limpeza do chalé',
+  )
+
+  cartao.dataset.reservaId = reserva.id
+  cartao.onclick = () => abrirDetalhesReserva(reserva.id)
+}
+
 function mostrarProximaReserva(cartao, reserva) {
   const badge = cartao.querySelector('.status-badge')
   const informacao = cartao.querySelector('.chale-information')
   const entrada = converterData(reserva.entrada)
 
-  cartao.classList.remove('chale-ocupado')
+  cartao.classList.remove(
+  'chale-ocupado',
+  'chale-limpeza',
+)
   cartao.classList.add('chale-reservado')
 
   badge.className = 'status-badge status-reservado'
@@ -129,22 +159,38 @@ function atualizarCartoes(reservas, agora) {
       (reserva) => reserva.chale === numero,
     )
 
-    const reservaAtual = reservasDoChale.find((reserva) => {
-      const entrada = converterData(reserva.entrada)
-      const saida = converterData(reserva.saida)
-
-      return entrada <= agora && saida > agora
-    })
+    const reservaAtual = reservasDoChale.find(
+      (reserva) =>
+        reserva.checkInRealizado === true &&
+        reserva.checkOutRealizado !== true,
+    )
 
     if (reservaAtual) {
       mostrarChaleOcupado(cartao, reservaAtual)
       continue
     }
 
-    const proximaReserva = reservasDoChale.find((reserva) => {
-      const entrada = converterData(reserva.entrada)
+    const reservaAguardandoLimpeza = reservasDoChale.find(
+      (reserva) =>
+        reserva.checkOutRealizado === true &&
+        reserva.limpeza === 'pendente',
+    )
 
-      return entrada > agora
+    if (reservaAguardandoLimpeza) {
+      mostrarAguardandoLimpeza(
+        cartao,
+        reservaAguardandoLimpeza,
+      )
+      continue
+    }
+
+    const proximaReserva = reservasDoChale.find((reserva) => {
+      const saida = converterData(reserva.saida)
+
+      return (
+        reserva.checkInRealizado !== true &&
+        saida > agora
+      )
     })
 
     if (proximaReserva) {
@@ -155,18 +201,26 @@ function atualizarCartoes(reservas, agora) {
     deixarChaleLivre(cartao)
   }
 }
+  
+
 
 function atualizarResumo(reservas, agora) {
-  const reservasAtivas = reservas.filter((reserva) => {
-    const entrada = converterData(reserva.entrada)
-    const saida = converterData(reserva.saida)
+ const reservasAtivas = reservas.filter(
+  (reserva) =>
+    reserva.checkInRealizado === true &&
+    reserva.checkOutRealizado !== true,
+)
 
-    return entrada <= agora && saida > agora
-  })
+const reservasEmLimpeza = reservas.filter(
+  (reserva) =>
+    reserva.checkOutRealizado === true &&
+    reserva.limpeza === 'pendente',
+)
 
-  const chalesOcupados = new Set(
-    reservasAtivas.map((reserva) => reserva.chale),
-  ).size
+const chalesIndisponiveis = new Set([
+  ...reservasAtivas.map((reserva) => reserva.chale),
+  ...reservasEmLimpeza.map((reserva) => reserva.chale),
+]).size
 
   const entradasHoje = reservas.filter((reserva) =>
     mesmoDia(converterData(reserva.entrada), agora),
@@ -176,8 +230,15 @@ function atualizarResumo(reservas, agora) {
     mesmoDia(converterData(reserva.saida), agora),
   ).length
 
-  atualizarNumero('#summary-available', 9 - chalesOcupados)
-  atualizarNumero('#summary-occupied', chalesOcupados)
+  atualizarNumero(
+  '#summary-available',
+  9 - chalesIndisponiveis,
+)
+
+atualizarNumero(
+  '#summary-occupied',
+  chalesIndisponiveis,
+)
   atualizarNumero('#summary-entries', entradasHoje)
   atualizarNumero('#summary-exits', saidasHoje)
 }
