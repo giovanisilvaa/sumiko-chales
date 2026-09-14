@@ -1,7 +1,9 @@
+import { iniciarReservasEmTempoReal } from './reservas-painel.js'
 import { signOut } from 'firebase/auth'
 import { auth } from './firebase.js'
 import { abrirAlteracaoPin } from './alterar-pin.js'
 import { abrirNovaReserva } from './nova-reserva.js'
+
 
 const usuarios = {
   renato: {
@@ -32,7 +34,10 @@ function criarCartaoChale(chale) {
   const residencia = chale.status === 'residencia'
 
   return `
-    <article class="chale-card ${residencia ? 'chale-residencia' : ''}">
+    <article
+  class="chale-card ${residencia ? 'chale-residencia' : ''}"
+  data-chale="${chale.numero}"
+>
       <div class="chale-card-header">
         <span class="chale-number">Chalé ${chale.numero}</span>
 
@@ -148,7 +153,7 @@ export function renderDashboard(usuarioId) {
           <article class="summary-card">
             <span class="summary-icon icon-available">✓</span>
             <div>
-              <strong>9</strong>
+              <strong id="summary-available">9</strong>
               <span>Chalés livres</span>
             </div>
           </article>
@@ -156,7 +161,7 @@ export function renderDashboard(usuarioId) {
           <article class="summary-card">
             <span class="summary-icon icon-occupied">●</span>
             <div>
-              <strong>0</strong>
+              <strong id="summary-occupied">0</strong>
               <span>Ocupados</span>
             </div>
           </article>
@@ -164,7 +169,7 @@ export function renderDashboard(usuarioId) {
           <article class="summary-card">
             <span class="summary-icon icon-entry">↓</span>
             <div>
-              <strong>0</strong>
+              <strong id="summary-entries">0</strong>
               <span>Entradas hoje</span>
             </div>
           </article>
@@ -172,7 +177,7 @@ export function renderDashboard(usuarioId) {
           <article class="summary-card">
             <span class="summary-icon icon-exit">↑</span>
             <div>
-              <strong>0</strong>
+              <strong id="summary-exits">0</strong>
               <span>Saídas hoje</span>
             </div>
           </article>
@@ -200,9 +205,11 @@ document
   })
 
   const newReservationButton =
-    document.querySelector('#new-reservation-button')
+  document.querySelector('#new-reservation-button')
 
- if (newReservationButton) {
+if (newReservationButton) {
   newReservationButton.addEventListener('click', abrirNovaReserva)
 }
+
+iniciarReservasEmTempoReal()
 }

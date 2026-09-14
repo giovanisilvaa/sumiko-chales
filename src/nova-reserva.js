@@ -1,3 +1,14 @@
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+} from 'firebase/firestore'
+import { auth, db } from './firebase.js'
+
+
 const formatadorMoeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -171,7 +182,7 @@ export function abrirNovaReserva() {
             </div>
 
             <div class="form-group">
-              <label for="forma-pagamento">Forma de pagamento</label>
+              <label for="forma-pagamento">Pagamento do sinal</label>
 
               <select
                 id="forma-pagamento"
@@ -264,36 +275,129 @@ export function abrirNovaReserva() {
   closeButton.addEventListener('click', fecharFormulario)
   cancelButton.addEventListener('click', fecharFormulario)
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault()
+  const botaoSalvar = form.querySelector('.save-reservation-button')
 
-    const entrada = new Date(form.entrada.value)
-    const saida = new Date(form.saida.value)
-    const valorTotal = Number(valorTotalInput.value)
-    const sinalPago = Number(sinalPagoInput.value)
+form.addEventListener('submit', async (event) => {
+  event.preventDefault()
 
-    if (saida <= entrada) {
-      message.textContent =
-        'A data e o horário de saída devem ser posteriores à entrada.'
-      return
-    }
+  const usuario = auth.currentUser
+  const chale = Number(document.querySelector('#chale').value)
+  const hospede = document.querySelector('#hospede').value.trim()
+  const telefone = document.querySelector('#telefone').value.trim()
+  const quantidadeHospedes = Number(
+    document.querySelector('#quantidade-hospedes').value,
+  )
+  const entrada = new Date(document.querySelector('#entrada').value)
+  const saida = new Date(document.querySelector('#saida').value)
+  const valorTotal = Number(
+    document.querySelector('#valor-total').value,
+  )
+  const sinalPago = Number(
+    document.querySelector('#sinal-pago').value,
+  )
+  const formaPagamento =
+    document.querySelector('#forma-pagamento').value
+  const status = document.querySelector('#status-reserva').value
+  const observacoes =
+    document.querySelector('#observacoes').value.trim()
+  const saldoRestante = valorTotal - sinalPago
 
-    if (sinalPago > valorTotal) {
-      message.textContent =
-        'O sinal pago não pode ser maior que o valor total.'
-      return
-    }
+  message.classList.remove('success')
+  message.textContent = ''
 
-    window.alert(
-      'Formulário validado. O salvamento será conectado ao banco de dados.',
+  if (!usuario) {
+    message.textContent =
+      'Sua sessão expirou. Saia do sistema e entre novamente.'
+    return
+  }
+
+  if (saida <= entrada) {
+    message.textContent =
+      'A saída precisa acontecer depois da entrada.'
+    return
+  }
+
+  if (sinalPago > valorTotal) {
+    message.textContent =
+      'O sinal não pode ser maior que o valor total.'
+    return
+  }
+
+  botaoSalvar.disabled = true
+  botaoSalvar.textContent = 'Verificando disponibilidade...'
+
+  try {
+    const consulta = query(
+      collection(db, 'reservas'),
+      where('chale', '==', chale),
     )
 
-    fecharFormulario()
-  })
+    const resultado = await getDocs(consulta)
 
-  dialog.addEventListener('close', () => {
-    dialog.remove()
-  })
+    const existeConflito = resultado.docs.some((documento) => {
+      const reserva = documento.data()
 
-  dialog.showModal()
+      if (reserva.status === 'cancelada') {
+        return false
+      }
+
+      const entradaExistente = reserva.entrada.toDate()
+      const saidaExistente = reserva.saida.toDate()
+
+      return entrada < saidaExistente && saida > entradaExistente
+    })
+
+    if (existeConflito) {
+      message.textContent =
+        'Este chalé já possui uma reserva nesse período.'
+      return
+    }
+
+    botaoSalvar.textContent = 'Salvando reserva...'
+
+    await addDoc(collection(db, 'reservas'), {
+      chale,
+      hospede,
+      telefone,
+      quantidadeHospedes,
+      entrada,
+      saida,
+      valorTotal,
+      sinalPago,
+      saldoRestante,
+      formaPagamentoSinal: formaPagamento,
+      status,
+      statusHospedagem: 'reservado',
+      observacoes,
+      saldoRecebido: saldoRestante === 0,
+      checkInRealizado: false,
+      checkOutRealizado: false,
+      limpeza: 'nao_necessaria',
+      criadoPor: usuario.email,
+      criadoEm: serverTimestamp(),
+      atualizadoEm: serverTimestamp(),
+    })
+
+    message.classList.add('success')
+    message.textContent = 'Reserva salva com sucesso!'
+
+    form.reset()
+    document.querySelector('#quantidade-hospedes').value = '1'
+    document.querySelector('#sinal-pago').value = '0'
+    document.querySelector('#saldo-restante').value = 'R$ 0,00'
+
+    setTimeout(() => {
+      dialog.close()
+    }, 1400)
+  } catch (error) {
+    console.error('Erro ao salvar reserva:', error)
+
+    message.textContent =
+      'Não foi possível salvar a reserva. Verifique a conexão e tente novamente.'
+  } finally {
+    botaoSalvar.disabled = false
+    botaoSalvar.textContent = 'Salvar reserva'
+  }
+})
+dialog.showModal()
 }

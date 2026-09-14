@@ -843,3 +843,279 @@ button:focus-visible {
     width: 100%;
   }
 }
+.reservation-message.success {
+  color: #16705f;
+}
+
+.save-reservation-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
+}
+/* Estados atualizados pelo Firebase */
+
+.demo-warning.connected {
+  color: #11624f;
+  background-color: #e5f6ef;
+  border-color: #b9e4d5;
+}
+
+.chale-ocupado {
+  border-top-color: var(--laranja);
+}
+
+.chale-reservado {
+  border-top-color: var(--azul);
+}
+
+.status-ocupado {
+  color: #9a4227;
+  background-color: #ffe5da;
+}
+
+.status-reservado {
+  color: #174785;
+  background-color: #e5effa;
+}
+/* Detalhes da reserva e check-in */
+
+.chale-clickable {
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.chale-clickable:hover {
+  box-shadow: 0 14px 30px rgba(13, 49, 94, 0.14);
+  transform: translateY(-3px);
+}
+
+.details-dialog {
+  width: min(760px, calc(100% - 32px));
+  max-height: 92vh;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--branco);
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(8, 32, 57, 0.28);
+}
+
+.details-dialog::backdrop {
+  background-color: rgba(8, 32, 57, 0.65);
+  backdrop-filter: blur(3px);
+}
+
+.details-content {
+  max-height: 92vh;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.details-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.details-header h2 {
+  margin: 0;
+  color: var(--azul-escuro);
+  font-size: 1.8rem;
+}
+
+.details-header p:last-child {
+  margin: 8px 0 0;
+  color: var(--cinza);
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.detail-item {
+  padding: 15px;
+  background-color: #f7f9fb;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+}
+
+.detail-item span,
+.financial-details span,
+.details-observation span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--cinza);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.detail-item strong {
+  color: var(--azul-escuro);
+}
+
+.financial-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+  padding: 18px;
+  background-color: #eef4fa;
+  border-radius: 12px;
+}
+
+.financial-details div {
+  padding: 4px 10px;
+}
+
+.financial-details strong {
+  color: var(--azul-escuro);
+  font-size: 1.05rem;
+}
+
+.balance-detail strong {
+  color: var(--verde);
+}
+
+.details-observation {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+}
+
+.details-observation p {
+  margin: 0;
+  color: #405467;
+  line-height: 1.5;
+}
+
+.checkin-area {
+  margin-top: 22px;
+}
+
+#checkin-form,
+.checkin-confirmed,
+.checkin-waiting {
+  padding: 20px;
+  border-radius: 12px;
+}
+
+#checkin-form {
+  background-color: #fff8ef;
+  border: 1px solid #f2d7b6;
+}
+
+.checkin-confirmed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #11624f;
+  background-color: #e5f6ef;
+  border: 1px solid #b9e4d5;
+}
+
+.checkin-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #72521c;
+  background-color: #fff7df;
+  border: 1px solid #f4dda0;
+}
+
+.checkin-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.checkin-heading span {
+  color: var(--laranja);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.checkin-heading h3 {
+  margin: 5px 0 0;
+  color: var(--azul-escuro);
+}
+
+.checkin-heading > strong {
+  color: var(--verde);
+  font-size: 1.25rem;
+}
+
+.paid-message {
+  color: #11624f;
+  font-weight: 700;
+}
+
+.checkin-message {
+  min-height: 22px;
+  color: #b23a2f;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.checkin-message.success {
+  color: #11624f;
+}
+
+.confirm-checkin-button {
+  margin: 0;
+}
+
+.confirm-checkin-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.details-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--borda);
+}
+
+.details-actions button {
+  width: auto;
+  margin: 0;
+}
+
+@media (max-width: 650px) {
+  .details-content {
+    padding: 22px 18px;
+  }
+
+  .details-grid,
+  .financial-details {
+    grid-template-columns: 1fr;
+  }
+
+  .financial-details {
+    gap: 10px;
+  }
+
+  .checkin-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .details-actions button {
+    width: 100%;
+  }
+}
