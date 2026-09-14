@@ -1,3 +1,5 @@
+import { abrirNovaReserva } from './nova-reserva.js'
+
 const usuarios = {
   renato: {
     nome: 'Renato',
@@ -178,11 +180,7 @@ export function renderDashboard(usuarioId) {
   const newReservationButton =
     document.querySelector('#new-reservation-button')
 
-  if (newReservationButton) {
-    newReservationButton.addEventListener('click', () => {
-      window.alert(
-        'O formulário de nova reserva será criado na próxima etapa.',
-      )
-    })
-  }
+ if (newReservationButton) {
+  newReservationButton.addEventListener('click', abrirNovaReserva)
+}
 }
