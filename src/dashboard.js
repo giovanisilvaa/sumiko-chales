@@ -1,3 +1,6 @@
+import { signOut } from 'firebase/auth'
+import { auth } from './firebase.js'
+import { abrirAlteracaoPin } from './alterar-pin.js'
 import { abrirNovaReserva } from './nova-reserva.js'
 
 const usuarios = {
@@ -99,15 +102,23 @@ export function renderDashboard(usuarioId) {
         </div>
 
         <div class="header-user">
-          <div>
-            <strong>${usuario.nome}</strong>
-            <span>${usuario.perfil}</span>
-          </div>
+  <div>
+    <strong>${usuario.nome}</strong>
+    <span>${usuario.perfil}</span>
+  </div>
 
-          <button type="button" id="logout-button" class="logout-button">
-            Sair
-          </button>
-        </div>
+  <button
+    type="button"
+    id="change-pin-button"
+    class="change-pin-button"
+  >
+    Alterar PIN
+  </button>
+
+  <button type="button" id="logout-button" class="logout-button">
+    Sair
+  </button>
+</div>
       </header>
 
       <main class="dashboard-content">
@@ -172,10 +183,21 @@ export function renderDashboard(usuarioId) {
       </main>
     </div>
   `
-
+document
+  .querySelector('#change-pin-button')
+  .addEventListener('click', abrirAlteracaoPin)
+  
   document
-    .querySelector('#logout-button')
-    .addEventListener('click', () => window.location.reload())
+  .querySelector('#logout-button')
+  .addEventListener('click', async () => {
+    try {
+      await signOut(auth)
+      window.location.reload()
+    } catch (error) {
+      console.error('Erro ao sair:', error)
+      window.alert('Não foi possível encerrar o acesso.')
+    }
+  })
 
   const newReservationButton =
     document.querySelector('#new-reservation-button')

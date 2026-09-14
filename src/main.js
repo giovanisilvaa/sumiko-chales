@@ -1,5 +1,13 @@
 import './style.css'
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from './firebase.js'
 import { renderDashboard } from './dashboard.js'
+
+const emailsUsuarios = {
+  renato: 'renato@sumikochales.app',
+  fernanda: 'fernanda@sumikochales.app',
+  giovani: 'giovani@sumikochales.app',
+}
 
 document.querySelector('#app').innerHTML = `
   <main class="login-page">
@@ -28,7 +36,7 @@ document.querySelector('#app').innerHTML = `
 
         <form id="login-form">
           <div class="form-group">
-            <d<label for="usuario">Usuário</label>
+            <label for="usuario">Usuário</label>
 
             <select id="usuario" name="usuario" required>
               <option value="">Selecione seu nome</option>
@@ -55,7 +63,7 @@ document.querySelector('#app').innerHTML = `
             />
           </div>
 
-          <button type="submit">Entrar</button>
+          <button type="submit" id="login-button">Entrar</button>
 
           <p id="login-message" class="login-message" role="status"></p>
         </form>
@@ -70,20 +78,52 @@ document.querySelector('#app').innerHTML = `
 
 const loginForm = document.querySelector('#login-form')
 const pinInput = document.querySelector('#pin')
+const loginButton = document.querySelector('#login-button')
 const loginMessage = document.querySelector('#login-message')
 
 pinInput.addEventListener('input', () => {
   pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 6)
 })
 
-loginForm.addEventListener('submit', (event) => {
+loginForm.addEventListener('submit', async (event) => {
   event.preventDefault()
 
   const usuarioId = document.querySelector('#usuario').value
+  const email = emailsUsuarios[usuarioId]
+  const pin = pinInput.value
 
-  loginMessage.textContent = 'Acessando o sistema...'
+  loginMessage.classList.remove('login-error')
+  loginMessage.textContent = 'Verificando acesso...'
+  loginButton.disabled = true
+  loginButton.textContent = 'Entrando...'
 
-  setTimeout(() => {
+  try {
+    await signInWithEmailAndPassword(auth, email, pin)
+  } catch (error) {
+    console.error('Falha no acesso:', error.code)
+
+    loginMessage.classList.add('login-error')
+    loginMessage.textContent =
+      'Usuário ou senha incorretos. Verifique os dados e tente novamente.'
+
+    pinInput.select()
+  } finally {
+    loginButton.disabled = false
+    loginButton.textContent = 'Entrar'
+  }
+})
+
+onAuthStateChanged(auth, (usuarioFirebase) => {
+ if (!usuarioFirebase) {
+  return
+}
+
+  const usuarioEncontrado = Object.entries(emailsUsuarios).find(
+    ([, email]) => email === usuarioFirebase.email,
+  )
+
+  if (usuarioEncontrado) {
+    const [usuarioId] = usuarioEncontrado
     renderDashboard(usuarioId)
-  }, 500)
+  }
 })
