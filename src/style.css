@@ -1165,3 +1165,62 @@ button:focus-visible {
   color: #7a5a0f;
   background-color: #fff3c9;
 }
+.owner-reservation-actions {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #d8e2ec;
+  border-radius: 14px;
+  background-color: #f7fafc;
+}
+
+.owner-actions-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.owner-actions-heading span {
+  color: #e56a3f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.owner-actions-heading strong {
+  color: #073263;
+  font-size: 1.05rem;
+}
+
+.owner-actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.owner-actions-buttons button {
+  flex: 1;
+  min-width: 180px;
+}
+
+#cancel-current-reservation-button {
+  color: #a82820;
+  border-color: #efb8b3;
+  background-color: #fff5f4;
+}
+
+#cancel-current-reservation-button:hover {
+  background-color: #ffe5e2;
+}
+
+@media (max-width: 600px) {
+  .owner-actions-buttons {
+    flex-direction: column;
+  }
+
+  .owner-actions-buttons button {
+    width: 100%;
+    min-width: 0;
+  }
+}

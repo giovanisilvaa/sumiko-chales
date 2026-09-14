@@ -5,6 +5,7 @@ import {
   updateDoc,
 } from 'firebase/firestore'
 import { auth, db } from './firebase.js'
+import { abrirEditarReserva } from './editar-reserva.js'
 
 const moeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -55,6 +56,11 @@ export async function abrirDetalhesReserva(reservaId) {
     const usuario = auth.currentUser
     const eZelador =
       usuario?.email === 'giovani@sumikochales.app'
+
+      const eProprietario = [
+  'renato@sumikochales.app',
+  'fernanda@sumikochales.app',
+].includes(usuario?.email)
 
     const saldoRestante = Number(reserva.saldoRestante) || 0
     const checkInRealizado = reserva.checkInRealizado === true
@@ -149,7 +155,10 @@ export async function abrirDetalhesReserva(reservaId) {
               <span>Observações</span>
               <p id="details-observation"></p>
             </section>
-
+<section
+  id="owner-reservation-actions"
+  class="owner-reservation-actions"
+></section>
             <section id="checkin-area" class="checkin-area"></section>
 
             <div class="details-actions">
@@ -217,7 +226,88 @@ if (checkOutRealizado && limpezaConcluida) {
 }
 
 definirTexto('#details-status', textoStatus)
+const ownerActions = document.querySelector(
+  '#owner-reservation-actions',
+)
 
+const podeAlterarReserva =
+  eProprietario &&
+  !checkInRealizado &&
+  !checkOutRealizado &&
+  reserva.status !== 'cancelada'
+
+if (podeAlterarReserva) {
+  ownerActions.innerHTML = `
+    <div class="owner-actions-heading">
+      <span>Operação do proprietário</span>
+      <strong>Gerenciar reserva</strong>
+    </div>
+
+    <div class="owner-actions-buttons">
+      <button
+        type="button"
+        id="edit-reservation-button"
+        class="save-reservation-button"
+      >
+        Editar reserva
+      </button>
+
+      <button
+        type="button"
+        id="cancel-current-reservation-button"
+        class="cancel-reservation-button"
+      >
+        Cancelar reserva
+      </button>
+    </div>
+  `
+
+  document
+    .querySelector('#edit-reservation-button')
+    .addEventListener('click', () => {
+      dialog.close()
+      abrirEditarReserva(reservaId)
+    })
+
+  document
+    .querySelector('#cancel-current-reservation-button')
+    .addEventListener('click', async (event) => {
+      const confirmou = window.confirm(
+        'Deseja realmente cancelar esta reserva?',
+      )
+
+      if (!confirmou) {
+        return
+      }
+
+      const botao = event.currentTarget
+
+      botao.disabled = true
+      botao.textContent = 'Cancelando...'
+
+      try {
+        await updateDoc(referencia, {
+          status: 'cancelada',
+          statusHospedagem: 'cancelada',
+          canceladaEm: serverTimestamp(),
+          canceladaPor: usuario.email,
+          atualizadoEm: serverTimestamp(),
+        })
+
+        window.alert('Reserva cancelada com sucesso.')
+        dialog.close()
+      } catch (error) {
+        console.error('Erro ao cancelar reserva:', error)
+
+        window.alert(
+          'Não foi possível cancelar a reserva.',
+        )
+
+        botao.disabled = false
+        botao.textContent = 'Cancelar reserva'
+      }
+    })
+}
     const checkinArea = document.querySelector('#checkin-area')
 
     if (checkInRealizado) {

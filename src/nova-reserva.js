@@ -337,9 +337,12 @@ form.addEventListener('submit', async (event) => {
     const existeConflito = resultado.docs.some((documento) => {
       const reserva = documento.data()
 
-      if (reserva.status === 'cancelada') {
-        return false
-      }
+      if (
+  reserva.status === 'cancelada' ||
+  reserva.statusHospedagem === 'finalizado'
+) {
+  return false
+}
 
       const entradaExistente = reserva.entrada.toDate()
       const saidaExistente = reserva.saida.toDate()
