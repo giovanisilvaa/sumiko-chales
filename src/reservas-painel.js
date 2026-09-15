@@ -255,11 +255,120 @@ atualizarNumero(
   atualizarNumero('#summary-exits', saidasHoje)
 }
 
-export function iniciarReservasEmTempoReal() {
+function tocarSomNovaReserva() {
+  try {
+    const AudioContext =
+      window.AudioContext || window.webkitAudioContext
+
+    if (!AudioContext) {
+      return
+    }
+
+    const contexto = new AudioContext()
+    const oscilador = contexto.createOscillator()
+    const volume = contexto.createGain()
+
+    oscilador.connect(volume)
+    volume.connect(contexto.destination)
+
+    oscilador.frequency.value = 880
+    volume.gain.setValueAtTime(0.15, contexto.currentTime)
+    volume.gain.exponentialRampToValueAtTime(
+      0.01,
+      contexto.currentTime + 0.6,
+    )
+
+    oscilador.start()
+    oscilador.stop(contexto.currentTime + 0.6)
+
+    oscilador.addEventListener('ended', () => {
+      contexto.close()
+    })
+  } catch (error) {
+    console.error('Não foi possível tocar o aviso:', error)
+  }
+}
+
+function mostrarAvisoNovaReserva(reserva) {
+  const alerta = document.createElement('button')
+  const titulo = document.createElement('strong')
+  const descricao = document.createElement('span')
+
+  alerta.type = 'button'
+  alerta.className = 'new-reservation-alert'
+
+  titulo.textContent = `Nova reserva — Chalé ${reserva.chale}`
+  descricao.textContent =
+    reserva.hospede || 'Consulte os dados da nova reserva.'
+
+  alerta.append(titulo, descricao)
+  document.body.append(alerta)
+
+  alerta.addEventListener('click', () => {
+    alerta.remove()
+    abrirDetalhesReserva(reserva.id)
+  })
+
+  tocarSomNovaReserva()
+
+  if (
+    'Notification' in window &&
+    Notification.permission === 'granted'
+  ) {
+    const notificacao = new Notification(
+      `Nova reserva — Chalé ${reserva.chale}`,
+      {
+        body:
+          reserva.hospede ||
+          'Uma nova reserva foi cadastrada.',
+        icon: '/images/logo-sumiko.jfif',
+      },
+    )
+
+    notificacao.onclick = () => {
+      window.focus()
+      abrirDetalhesReserva(reserva.id)
+      notificacao.close()
+    }
+  }
+
+  window.setTimeout(() => {
+    alerta.remove()
+  }, 10000)
+}
+export async function solicitarPermissaoNotificacoes() {
+  if (!('Notification' in window)) {
+    window.alert(
+      'Este navegador não oferece suporte a notificações.',
+    )
+    return
+  }
+
+  if (Notification.permission === 'granted') {
+    window.alert('As notificações já estão ativadas.')
+    return
+  }
+
+  const permissao = await Notification.requestPermission()
+
+  if (permissao === 'granted') {
+    window.alert(
+      'Notificações ativadas com sucesso.',
+    )
+    return
+  }
+
+  window.alert(
+    'A permissão não foi concedida. Você continuará recebendo o aviso dentro do sistema.',
+  )
+}
+export function iniciarReservasEmTempoReal(usuarioId) {
   const consultaReservas = query(
     collection(db, 'reservas'),
     orderBy('entrada', 'asc'),
   )
+
+  let primeiraLeitura = true
 
   return onSnapshot(
     consultaReservas,
@@ -275,6 +384,24 @@ export function iniciarReservasEmTempoReal() {
 
       atualizarResumo(reservas, agora)
       atualizarCartoes(reservas, agora)
+
+      if (!primeiraLeitura && usuarioId === 'giovani') {
+        resultado.docChanges().forEach((alteracao) => {
+          const reserva = {
+            id: alteracao.doc.id,
+            ...alteracao.doc.data(),
+          }
+
+          if (
+            alteracao.type === 'added' &&
+            reserva.status !== 'cancelada'
+          ) {
+            mostrarAvisoNovaReserva(reserva)
+          }
+        })
+      }
+
+      primeiraLeitura = false
 
       const aviso = document.querySelector('.demo-warning')
 

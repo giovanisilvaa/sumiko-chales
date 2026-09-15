@@ -1,4 +1,7 @@
-import { iniciarReservasEmTempoReal } from './reservas-painel.js'
+import {
+  iniciarReservasEmTempoReal,
+  solicitarPermissaoNotificacoes,
+} from './reservas-painel.js'
 import { signOut } from 'firebase/auth'
 import { auth } from './firebase.js'
 import { abrirAlteracaoPin } from './alterar-pin.js'
@@ -112,7 +115,19 @@ export function renderDashboard(usuarioId) {
     <strong>${usuario.nome}</strong>
     <span>${usuario.perfil}</span>
   </div>
-
+${
+  usuarioId === 'giovani'
+    ? `
+      <button
+        type="button"
+        id="notification-button"
+        class="notification-button"
+      >
+        🔔 Ativar avisos
+      </button>
+    `
+    : ''
+}
   <button
     type="button"
     id="change-pin-button"
@@ -210,6 +225,15 @@ export function renderDashboard(usuarioId) {
 document
   .querySelector('#change-pin-button')
   .addEventListener('click', abrirAlteracaoPin)
+  const notificationButton =
+  document.querySelector('#notification-button')
+
+if (notificationButton) {
+  notificationButton.addEventListener(
+    'click',
+    solicitarPermissaoNotificacoes,
+  )
+}
   
   document
   .querySelector('#logout-button')
@@ -237,5 +261,5 @@ if (newReservationButton) {
   newReservationButton.addEventListener('click', abrirNovaReserva)
 }
 
-iniciarReservasEmTempoReal()
+iniciarReservasEmTempoReal(usuarioId)
 }

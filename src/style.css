@@ -1468,3 +1468,86 @@ button:focus-visible {
 .reservation-owner strong {
   color: #073263;
 }
+.new-reservation-alert {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px 20px;
+  border: 1px solid #9ed9c7;
+  border-radius: 14px;
+  background: #e5f8f2;
+  color: #0a2748;
+  text-align: left;
+  box-shadow: 0 12px 32px rgba(10, 39, 72, 0.2);
+  cursor: pointer;
+  animation: show-new-reservation-alert 0.3s ease-out;
+}
+
+.new-reservation-alert strong {
+  font-size: 16px;
+}
+
+.new-reservation-alert span {
+  color: #3d5873;
+  font-size: 14px;
+}
+
+.new-reservation-alert:hover {
+  background: #d8f3eb;
+}
+
+@keyframes show-new-reservation-alert {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .new-reservation-alert {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+.notification-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #9ed9c7;
+  border-radius: 10px;
+  background: #e5f8f2;
+  color: #075c48;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.notification-button:hover {
+  background: #d1f1e7;
+  transform: translateY(-1px);
+}
+
+.notification-button:focus-visible {
+  outline: 3px solid rgba(7, 92, 72, 0.25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .notification-button {
+    width: 100%;
+  }
+}
