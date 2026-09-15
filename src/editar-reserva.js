@@ -135,7 +135,17 @@ export async function abrirEditarReserva(reservaId) {
                   ${criarOpcoesChales()}
                 </select>
               </div>
+<div class="form-group">
+  <label for="edit-responsavel-reserva">
+    Responsável pela reserva
+  </label>
 
+  <select id="edit-responsavel-reserva" required>
+    <option value="">Selecione</option>
+    <option value="renato">Renato</option>
+    <option value="fernanda">Fernanda</option>
+  </select>
+</div>
               <div class="form-group">
                 <label for="edit-hospede">
                   Nome do hóspede
@@ -308,6 +318,9 @@ export async function abrirEditarReserva(reservaId) {
     )
     const chaleInput =
       document.querySelector('#edit-chale')
+      const responsavelInput = document.querySelector(
+  '#edit-responsavel-reserva',
+)
     const hospedeInput =
       document.querySelector('#edit-hospede')
     const telefoneInput =
@@ -344,6 +357,17 @@ export async function abrirEditarReserva(reservaId) {
       '.save-reservation-button',
     )
         chaleInput.value = String(reserva.chale)
+        const responsavelAnterior =
+  reserva.responsavelReserva ||
+  reserva.criadoPor?.split('@')[0] ||
+  ''
+
+responsavelInput.value = [
+  'renato',
+  'fernanda',
+].includes(responsavelAnterior)
+  ? responsavelAnterior
+  : ''
     hospedeInput.value = reserva.hospede || ''
     telefoneInput.value = reserva.telefone || ''
     quantidadeInput.value = String(
@@ -409,6 +433,7 @@ export async function abrirEditarReserva(reservaId) {
       event.preventDefault()
 
       const chale = Number(chaleInput.value)
+      const responsavelReserva = responsavelInput.value
       const hospede = hospedeInput.value.trim()
       const telefone = telefoneInput.value.trim()
       const quantidadeHospedes = Number(
@@ -489,6 +514,7 @@ export async function abrirEditarReserva(reservaId) {
 
         await updateDoc(referencia, {
           chale,
+          responsavelReserva,
           hospede,
           telefone,
           quantidadeHospedes,

@@ -53,6 +53,15 @@ export async function abrirDetalhesReserva(reservaId) {
     }
 
     const reserva = resultado.data()
+    const codigoResponsavel =
+  reserva.responsavelReserva ||
+  reserva.criadoPor?.split('@')[0]
+
+const nomeResponsavel =
+  {
+    renato: 'Renato',
+    fernanda: 'Fernanda',
+  }[codigoResponsavel] || 'Não informado'
     const usuario = auth.currentUser
     const eZelador =
       usuario?.email === 'giovani@sumikochales.app'
@@ -118,6 +127,10 @@ export async function abrirDetalhesReserva(reservaId) {
                 <span>Chalé</span>
                 <strong id="details-chale"></strong>
               </div>
+              <div class="detail-item">
+  <span>Responsável pela reserva</span>
+  <strong id="details-owner"></strong>
+</div>
 
               <div class="detail-item">
                 <span>Quantidade de hóspedes</span>
@@ -183,6 +196,7 @@ export async function abrirDetalhesReserva(reservaId) {
     definirTexto('#details-guest', reserva.hospede)
     definirTexto('#details-phone', reserva.telefone)
     definirTexto('#details-chale', `Chalé ${reserva.chale}`)
+    definirTexto('#details-owner', nomeResponsavel)
     definirTexto(
       '#details-people',
       String(reserva.quantidadeHospedes),

@@ -1459,3 +1459,12 @@ button:focus-visible {
   color: #073263;
   background: #edf4fb;
 }
+.reservation-owner {
+  margin: 7px 0 0;
+  color: #52677d;
+  font-size: 0.8rem;
+}
+
+.reservation-owner strong {
+  color: #073263;
+}

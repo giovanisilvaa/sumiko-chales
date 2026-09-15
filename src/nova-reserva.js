@@ -72,6 +72,21 @@ export function abrirNovaReserva() {
                 ${criarOpcoesChales()}
               </select>
             </div>
+            <div class="form-group">
+  <label for="responsavel-reserva">
+    Responsável pela reserva
+  </label>
+
+  <select
+    id="responsavel-reserva"
+    name="responsavelReserva"
+    required
+  >
+    <option value="">Selecione</option>
+    <option value="renato">Renato</option>
+    <option value="fernanda">Fernanda</option>
+  </select>
+</div>
 
             <div class="form-group">
               <label for="hospede">Nome do hóspede</label>
@@ -282,6 +297,8 @@ form.addEventListener('submit', async (event) => {
 
   const usuario = auth.currentUser
   const chale = Number(document.querySelector('#chale').value)
+  const responsavelReserva =
+  document.querySelector('#responsavel-reserva').value
   const hospede = document.querySelector('#hospede').value.trim()
   const telefone = document.querySelector('#telefone').value.trim()
   const quantidadeHospedes = Number(
@@ -360,6 +377,7 @@ form.addEventListener('submit', async (event) => {
 
     await addDoc(collection(db, 'reservas'), {
       chale,
+      responsavelReserva,
       hospede,
       telefone,
       quantidadeHospedes,

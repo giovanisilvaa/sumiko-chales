@@ -91,6 +91,15 @@ function ordenarReservas(reservas) {
 
 function criarCartaoReserva(reserva) {
   const situacao = obterSituacao(reserva)
+  const codigoResponsavel =
+  reserva.responsavelReserva ||
+  reserva.criadoPor?.split('@')[0]
+
+const nomeResponsavel =
+  {
+    renato: 'Renato',
+    fernanda: 'Fernanda',
+  }[codigoResponsavel] || 'Não informado'
 
   return `
     <article class="reservation-list-card">
@@ -100,6 +109,9 @@ function criarCartaoReserva(reserva) {
           <h3>
             ${reserva.hospede || 'Hóspede não informado'}
           </h3>
+          <p class="reservation-owner">
+  Responsável: <strong>${nomeResponsavel}</strong>
+</p>
         </div>
 
         <span
