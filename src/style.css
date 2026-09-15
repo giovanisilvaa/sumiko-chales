@@ -49,7 +49,7 @@ select {
       rgba(10, 39, 72, 0.1),
       rgba(10, 39, 72, 0.88)
     ),
-    url("/images/fachada-sumiko.jpeg") center / cover no-repeat;
+    url("/images/vista-sumiko.jpg") center / cover no-repeat;
 }
 
 .image-overlay {
