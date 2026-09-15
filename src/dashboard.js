@@ -3,6 +3,7 @@ import { signOut } from 'firebase/auth'
 import { auth } from './firebase.js'
 import { abrirAlteracaoPin } from './alterar-pin.js'
 import { abrirNovaReserva } from './nova-reserva.js'
+import { abrirListaReservas } from './lista-reservas.js'
 
 
 const usuarios = {
@@ -134,15 +135,33 @@ export function renderDashboard(usuarioId) {
             <p>Acompanhe a situação dos chalés e das hospedagens.</p>
           </div>
 
-          ${
-            podeCadastrarReserva
-              ? `
-                <button type="button" id="new-reservation-button" class="new-reservation-button">
-                  + Nova reserva
-                </button>
-              `
-              : ''
-          }
+          <div class="welcome-actions">
+  <button
+    type="button"
+    id="list-reservations-button"
+    <button
+  type="button"
+  id="list-reservations-button"
+  class="new-reservation-button"
+>
+  Ver reservas
+</button>
+  </button>
+
+  ${
+    podeCadastrarReserva
+      ? `
+        <button
+          type="button"
+          id="new-reservation-button"
+          class="new-reservation-button"
+        >
+          + Nova reserva
+        </button>
+      `
+      : ''
+  }
+</div>
         </section>
 
         <p class="demo-warning">
@@ -202,8 +221,15 @@ document
       console.error('Erro ao sair:', error)
       window.alert('Não foi possível encerrar o acesso.')
     }
-  })
+  }
+)
+const listReservationsButton =
+  document.querySelector('#list-reservations-button')
 
+listReservationsButton.addEventListener(
+  'click',
+  abrirListaReservas,
+)
   const newReservationButton =
   document.querySelector('#new-reservation-button')
 

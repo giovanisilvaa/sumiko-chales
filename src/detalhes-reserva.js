@@ -66,6 +66,7 @@ export async function abrirDetalhesReserva(reservaId) {
     const checkInRealizado = reserva.checkInRealizado === true
     const checkOutRealizado = reserva.checkOutRealizado === true
     const limpezaPendente = reserva.limpeza === 'pendente'
+    const reservaCancelada = reserva.status === 'cancelada'
     const limpezaConcluida = reserva.limpeza === 'concluida'
     const pagamentoCompleto =
       reserva.saldoRecebido === true || saldoRestante === 0
@@ -224,7 +225,9 @@ if (checkOutRealizado && limpezaPendente) {
 if (checkOutRealizado && limpezaConcluida) {
   textoStatus = 'Hospedagem finalizada • Chalé limpo'
 }
-
+if (reservaCancelada) {
+  textoStatus = 'Reserva cancelada'
+}
 definirTexto('#details-status', textoStatus)
 const ownerActions = document.querySelector(
   '#owner-reservation-actions',
@@ -310,7 +313,16 @@ if (podeAlterarReserva) {
 }
     const checkinArea = document.querySelector('#checkin-area')
 
-    if (checkInRealizado) {
+    if (reservaCancelada) {
+  checkinArea.innerHTML = `
+    <div class="checkin-waiting">
+      <strong>Reserva cancelada</strong>
+      <span>
+        Nenhuma operação pode ser realizada nesta reserva.
+      </span>
+    </div>
+  `
+} else if (checkInRealizado) {
       checkinArea.innerHTML = `
         <div class="checkin-confirmed">
           <strong>✓ Check-in confirmado</strong>

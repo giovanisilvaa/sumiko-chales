@@ -222,13 +222,25 @@ const chalesIndisponiveis = new Set([
   ...reservasEmLimpeza.map((reserva) => reserva.chale),
 ]).size
 
-  const entradasHoje = reservas.filter((reserva) =>
-    mesmoDia(converterData(reserva.entrada), agora),
-  ).length
+ const entradasHoje = reservas.filter(
+  (reserva) =>
+    reserva.status !== 'cancelada' &&
+    reserva.statusHospedagem !== 'finalizado' &&
+    mesmoDia(
+      converterData(reserva.entrada),
+      agora,
+    ),
+).length
 
-  const saidasHoje = reservas.filter((reserva) =>
-    mesmoDia(converterData(reserva.saida), agora),
-  ).length
+const saidasHoje = reservas.filter(
+  (reserva) =>
+    reserva.status !== 'cancelada' &&
+    reserva.statusHospedagem !== 'finalizado' &&
+    mesmoDia(
+      converterData(reserva.saida),
+      agora,
+    ),
+).length
 
   atualizarNumero(
   '#summary-available',
